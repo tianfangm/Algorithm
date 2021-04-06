@@ -116,55 +116,51 @@ int main()
 }
 
 // 比较快的解法
+#include<cstdio>
 #include<iostream>
 #include<queue>
 #include<vector>
 using namespace std;
-vector<vector<int>> Adj; //邻接表 
-vector<bool> inq; //节点是入队
-int BFS(int v){
-	inq[v] = true;
-	queue<int> q;
-	q.push(v);
-	int count = 1,level = 0; //初始化距离不超过6的结点数和层数 
-	int tail,last = v; //tail为每层最后一个节点的临时标志，tail为每层最后一个节点，初始化0层的最后一个节点为v 
+struct Node{
+	int id,layer;
+};
+vector<vector<int>> Adj; 
+vector<bool> inq;
+int BFS(Node tnode){
+	queue<Node> q;
+	q.push(tnode); //入队 
+	inq[tnode.id] = true; //设置已入队
+	int count = 1;
 	while(!q.empty()){
-		int tmp = q.front();
+		Node top = q.front();
 		q.pop();
-		for(int i = 0; i < Adj[tmp].size(); i++){//遍历所有邻接点 
-			int w = Adj[tmp][i]; 
-			if(!inq[w]){//未被访问
-				q.push(w); //邻接点入队
-				count++;
-				inq[w] = true; //标记已访问 
-				tail = w; //最后一个节点的临时标志 
-			} 
+		for(int i = 0; i < Adj[top.id].size(); i++){
+			int nextId = Adj[top.id][i];
+			if(!inq[nextId] && top.layer < 6){
+				Node next = {nextId, top.layer + 1};
+				q.push(next);
+				inq[nextId] = true; //设置已入队
+				count++; 
+			}
 		}
-		if(tmp == last){ //当前访问完毕的节点为该层最后一个节点，则level+1，此时下一层的节点已全入队，更新last
-			level++;
-			last = tail;
-		}
-		if(level == 6) break;
 	}
 	return count;
 }
-int main()
-{
+int main(){
 	int n,m,x,y;
 	cin>>n>>m;
 	Adj.resize(n+1);
 	inq.resize(n+1);
-	for(int i = 0; i < m; i++){//建立边
+	for(int i = 0; i < m; i++){
 		cin>>x>>y;
-		Adj[x].push_back(y); 
-		Adj[y].push_back(x); 
+		Adj[x].push_back(y);
+		Adj[y].push_back(x);
 	}
 	int count;
 	for(int i = 1; i <= n; i++){
-		inq.assign(n+1,false); //设置未被访问
-		count = BFS(i);
+		inq.assign(n+1,false);
+		Node tnode = {i, 0}; //初始化节点的层数为0 
+		count = BFS(tnode);
 		printf("%d: %.2f%\n",i,((double)count/n)*100); 
 	}
-	return 0;	
-}  
-
+}
