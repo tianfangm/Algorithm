@@ -3,6 +3,8 @@
 
 using namespace std;
 
+const int Cutoff = 0;
+
 // 输出
 void Print(const vector<int>&vec)
 {
@@ -229,6 +231,60 @@ void merge_sort1(vector<int>&nums)
     }
 }
 
+// -----------------------------------快速排序-----------------------------------
+int Median3(vector<int>&nums,int l,int r)
+{
+    int center = (l+r)>>1;
+    if(nums[l]>nums[center])
+    {
+        swap(nums[l],nums[center]);
+    }
+    if(nums[l]>nums[r])
+    {
+        swap(nums[l],nums[r]);
+    }
+    if(nums[center]>nums[r])
+    {
+        swap(nums[center],nums[r]);
+    }
+    // nums[left]<=nums[center]<=nums[r]
+    swap(nums[center],nums[r-1]);
+    // 只需要考虑nums[l+1] - nums[r-2]
+    return nums[r-1];
+}
+
+void qsort(vector<int>&nums,int l,int r)
+{
+    if(Cutoff<=r-l)
+    {
+        // 选主元
+        int pivot = Median3(nums,l,r);
+        int i = l ,j = r - 1;
+        while(i<j)
+        {
+            while(nums[--j]>pivot);
+            while(nums[++i]<pivot);
+            if(i<j)
+            {
+                swap(nums[i],nums[j]);
+            }
+        }
+        swap(nums[i],nums[r-1]);
+        qsort(nums,l,i-1);
+        qsort(nums,i+1,r);
+    }
+    else
+    {
+        // 剩余元素过少，使用简单排序
+    }
+
+}
+
+void quick_sort(vector<int>&nums)
+{
+    qsort(nums,0,nums.size()-1);
+}
+
 // -----------------------------------main-----------------------------------
 int main()
 {
@@ -248,7 +304,8 @@ int main()
     //shell_sort(nums);
     //heap_sort(nums);
     //merge_sort(nums);
-    merge_sort1(nums);
+    //merge_sort1(nums);
+    quick_sort(nums);
 
     Print(nums);
 
